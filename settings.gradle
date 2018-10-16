@@ -1,0 +1,4 @@
+rootProject.name = 'ron-seekers-common-parents'
+include (":ron-seekers-config-server")
+include 'ron-seekers-config-client'
+
