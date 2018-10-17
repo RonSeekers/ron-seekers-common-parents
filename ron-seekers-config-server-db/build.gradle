@@ -1,0 +1,109 @@
+buildscript {
+    ext {
+        springBootVersion = '2.0.0.M6'
+    }
+    repositories {
+        mavenLocal()
+        maven { url 'http://118.126.64.177:8081/nexus/content/groups/public/' }
+        maven { url 'https://repo.spring.io/libs-snapshot' }
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+group 'com.ron.seekers'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'application'
+apply plugin: 'org.springframework.boot'
+//apply plugin: 'io.spring.dependency-management'
+
+mainClassName = "com.ron.seekers.DBConfigServieBoot"
+bootJar {
+    mainClassName = mainClassName
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    maven { url 'http://118.126.64.177:8081/nexus/content/groups/public/' }
+    mavenCentral()
+
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+task('create-dirs') {
+    doLast {
+        sourceSets*.java.srcDirs*.each { it.mkdirs() }
+        sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+    }
+}
+
+
+task ('runDebug', type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = mainClassName
+    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5090']
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+
+dependencies {
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-config-server', version: '2.0.1.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
+    testCompile 'junit:junit:4.12'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.0.RELEASE'
+    compile group: 'org.springframework', name: 'spring-web', version: '4.3.7.RELEASE'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
+  //  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '2.0.1.RELEASE'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.4'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.36'
+   // compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.0'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.0.4.RELEASE'
+
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    // 这里做了判断
+    // 在version 中带有 SNAPSHOT 关键字的上传到快照节点, 否则上传到 releases 节点.
+    repositories {
+        if (version.toString().contains('SNAPSHOT')) {
+            maven {
+                name 'snapshots'
+                url 'http://118.126.64.177:8081/nexus/content/repositories/releases/'
+                credentials {
+                    username 'admin'
+                    password 'admin123'
+                }
+            }
+        } else {
+            maven {
+                name 'releases'
+                url 'http://118.126.64.177:8081/nexus/content/repositories/snapshots/'
+                credentials {
+                    username 'admin'
+                    password 'admin123'
+                }
+            }
+        }
+    }
+}

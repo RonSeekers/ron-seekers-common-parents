@@ -16,7 +16,4 @@ public class ConfigServerBoot {
         SpringApplication.run(ConfigServerBoot.class,args);
     }
 
-
-
-
 }
