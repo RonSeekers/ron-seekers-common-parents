@@ -3,6 +3,7 @@ package com.ron.seekers.controller;
 import com.ron.seekers.util.HttpConnect;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 public class TestRefreshController {
 
 
-    @Value("${myww}") // git配置文件里的key
+    @Value(value = "${myww}") // git配置文件里的key
      String myww;
 
 
